@@ -13,6 +13,10 @@ dist/
 coverage/
 test-results/
 playwright-report/
+reports/
+container-logs.txt
+release-manifest.json
+release-notes.md
 .DS_Store
 data/
 apps/web/src-capacitor/android/

@@ -1,5 +1,6 @@
 .git
 .env
+.env.*
 **/.venv
 **/node_modules
 **/__pycache__
@@ -11,3 +12,7 @@
 **/test-results
 **/playwright-report
 **/staticfiles
+**/reports
+container-logs.txt
+release-manifest.json
+release-notes.md

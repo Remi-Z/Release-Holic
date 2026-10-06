@@ -1,0 +1,71 @@
+x-backend: &backend
+  image: ${BACKEND_IMAGE:-ghcr.io/remi-z/release-holic-backend}:${IMAGE_TAG:-main}
+  env_file: .env
+  environment:
+    DATABASE_URL: postgres://releaseholic:${POSTGRES_PASSWORD:-releaseholic}@db:5432/releaseholic
+    CELERY_BROKER_URL: amqp://releaseholic:${RABBITMQ_PASSWORD:-releaseholic}@rabbitmq:5672//
+  restart: unless-stopped
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: releaseholic
+      POSTGRES_USER: releaseholic
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-releaseholic}
+    volumes: [postgres:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U releaseholic -d releaseholic"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: releaseholic
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-releaseholic}
+    volumes: [rabbitmq:/var/lib/rabbitmq]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+  migrate:
+    <<: *backend
+    restart: "no"
+    command: ["python", "manage.py", "migrate", "--noinput"]
+    depends_on:
+      db: {condition: service_healthy}
+  api:
+    <<: *backend
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      rabbitmq: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  worker:
+    <<: *backend
+    command: ["celery", "-A", "config", "worker", "--loglevel=INFO", "--concurrency=2"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      rabbitmq: {condition: service_healthy}
+  scheduler:
+    <<: *backend
+    command: ["celery", "-A", "config", "beat", "--loglevel=INFO", "--schedule=/tmp/release-holic-beat"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      rabbitmq: {condition: service_healthy}
+  web:
+    image: ${WEB_IMAGE:-ghcr.io/remi-z/release-holic-web}:${IMAGE_TAG:-main}
+    ports: ["127.0.0.1:8080:80"]
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
+volumes:
+  postgres:
+  rabbitmq:

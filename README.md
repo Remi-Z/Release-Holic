@@ -1,5 +1,7 @@
 # Release-Holic
 
+[![CI and container releases](https://github.com/Remi-Z/Release-Holic/actions/workflows/checks.yml/badge.svg)](https://github.com/Remi-Z/Release-Holic/actions/workflows/checks.yml)
+
 An evidence-backed timeline for TV series, movies, Japanese anime, web novels, and published light novels. Follow stories, keep private watching/reading progress, inspect source evidence, and review uncertain announcements before adding them to your timeline.
 
 The repository contains a Quasar/Vue/TypeScript client, a Django 5.2 + Django Ninja API, PostgreSQL data models, and independently running Celery ingestion workers and scheduler. RabbitMQ carries jobs; Scrapy collects publisher and Kakuyomu metadata; PydanticAI provides optional bring-your-own-model extraction.
@@ -25,6 +27,27 @@ docker compose exec api python manage.py seed_demo --user YOUR_USERNAME
 This creates seven labelled demo stories, account-private illustrative events, and a review example. It creates no password and makes no factual release claims.
 
 The default configuration is for a personal server on local HTTP. For a public HTTPS deployment, set `DEBUG=0`, configure `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS`, and place the web container behind your HTTPS reverse proxy. Keep the Django secret and optional `MODEL_ENCRYPTION_KEY` stable so saved model credentials remain decryptable.
+
+## Prebuilt images and automatic releases
+
+GitHub Actions tests the backend against PostgreSQL, builds the SPA/PWA, runs desktop/mobile browser checks, then starts the complete container stack before publishing two Linux AMD64 images:
+
+- `ghcr.io/remi-z/release-holic-backend` — API, ingestion worker, and scheduler.
+- `ghcr.io/remi-z/release-holic-web` — the built PWA and Nginx proxy.
+
+Successful `main` builds publish `:main` and `:sha-COMMIT`. A tag such as `v0.1.0` publishes `:v0.1.0`, `:0.1.0`, `:latest`, and a GitHub Release with image digests. Prerelease tags such as `v0.1.0-rc.1` never update `:latest`. Pull requests run validation without publishing. The workflow uses its repository-scoped `GITHUB_TOKEN`; no registry secret needs to be added.
+
+To run the prebuilt images:
+
+```sh
+cp -n .env.example .env
+# Set your persistent secret and desired IMAGE_TAG in .env.
+docker compose -f compose.images.yaml pull
+docker compose -f compose.images.yaml up -d
+docker compose -f compose.images.yaml exec api python manage.py createsuperuser
+```
+
+New GHCR packages start private; use an account with package read access to log in, or set the packages public in GitHub for anonymous pulls. See [container release instructions](docs/container-releases.md) for version tags, registry access, and deployment updates.
 
 ## Local development
 
@@ -100,7 +123,13 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Browser acceptance tests use controlled API fixtures to verify the UI on desktop and mobile. Django tests exercise real database operations and API authorization; adapter tests use stored HTML and mocked provider responses. Live credentials are not required for the fixture suite. CI runs both suites and checks generated contracts for drift.
+Browser acceptance tests use controlled API fixtures to verify the UI on desktop and mobile. Django tests exercise real database operations and API authorization; adapter tests use stored HTML and mocked provider responses. Live credentials are not required for the fixture suite. CI runs both suites, checks generated contracts and migrations for drift, and validates the packaged stack. It supplies the dependency locks used by the tests to both Docker builds.
+
+The release policy checks run with the Python standard library:
+
+```sh
+python -m unittest discover -s scripts/tests -v
+```
 
 The pure date/identity/chapter-reconciliation suite also runs without Django:
 

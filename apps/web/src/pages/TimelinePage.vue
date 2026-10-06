@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import type { ComponentPublicInstance } from 'vue';
 import { useVirtualizer } from '@tanstack/vue-virtual';
 import { api, json, queryString } from '../api/client';
 import type { EventOut, FilterOut, FranchiseOut, StatsOut, TimelineOut } from '../api/contracts';
@@ -34,6 +35,9 @@ function groupLabel(event: EventOut) {
 const rows = computed(() => events.value.map((event, index) => ({ event, heading: index === 0 || groupLabel(events.value[index - 1]!) !== groupLabel(event) ? groupLabel(event) : '' })));
 const virtualizer = useVirtualizer(computed(() => ({ count: rows.value.length, getScrollElement: () => scroll.value, estimateSize: (index: number) => rows.value[index]?.heading ? 204 : 162, overscan: 6, getItemKey: (index: number) => rows.value[index]!.event.id })));
 const virtualRows = computed(() => virtualizer.value.getVirtualItems());
+function measureRow(node: Element | ComponentPublicInstance | null) {
+  virtualizer.value.measureElement(node instanceof Element ? node : null);
+}
 watch(virtualRows, items => { const last = items.at(-1); if (last && last.index >= rows.value.length - 6 && events.value.length < total.value) void loadMore(); });
 const activeFilterCount = computed(() => [filters.medium, filters.platform, filters.region, filters.verification, filters.lifecycle, filters.status, filters.franchise_id, filters.work_id, filters.date_to].filter(Boolean).length);
 
@@ -91,7 +95,7 @@ onUnmounted(() => { generation++; clearTimeout(debounce); window.removeEventList
       <section class="timeline-main" aria-label="Dated timeline"><div class="section-caption"><span>{{ filters.basis === 'announcement' ? 'WHEN THE NEWS ARRIVED' : 'ON THE HORIZON' }}</span><span>{{ total }} event{{ total === 1 ? '' : 's' }}</span></div>
         <div v-if="loading" class="skeleton-list" aria-label="Loading timeline"><q-skeleton v-for="n in 3" :key="n" height="146px" class="rounded-panel" /></div>
         <div v-else-if="!events.length" class="empty-state"><span class="empty-symbol"><q-icon name="explore" /></span><h2>{{ stats?.followed ? 'A quiet stretch ahead' : 'A story starts with a follow' }}</h2><p>{{ stats?.followed ? 'Try another date range or check the undated releases. Your sources will keep looking for updates.' : 'Find a show, film, anime, or novel. Its releases and source evidence will find a home here.' }}</p><q-btn unelevated color="primary" no-caps label="Find a story" icon="add" @click="openSearch()" /></div>
-        <div v-else ref="scroll" class="timeline-scroll" tabindex="0" aria-label="Scrollable timeline"><div :style="{ height: `${virtualizer.getTotalSize()}px`, position: 'relative' }"><div v-for="row in virtualRows" :key="String(row.key)" :ref="virtualizer.measureElement" :data-index="row.index" class="virtual-row" :style="{ position: 'absolute', top: 0, left: 0, width: '100%', transform: `translateY(${row.start}px)` }"><div v-if="rows[row.index]?.heading" class="timeline-group"><span class="timeline-point" /><h2>{{ rows[row.index]?.heading }}</h2></div><EventCard :event="rows[row.index]!.event" :basis="filters.basis" /></div></div><div class="list-end"><q-spinner v-if="loadingMore" color="primary" /><q-btn v-else-if="events.length < total" flat no-caps label="Load more" @click="loadMore" /><span v-else>You’re all caught up with this view.</span></div></div>
+        <div v-else ref="scroll" class="timeline-scroll" tabindex="0" aria-label="Scrollable timeline"><div :style="{ height: `${virtualizer.getTotalSize()}px`, position: 'relative' }"><div v-for="row in virtualRows" :key="String(row.key)" :ref="measureRow" :data-index="row.index" class="virtual-row" :style="{ position: 'absolute', top: 0, left: 0, width: '100%', transform: `translateY(${row.start}px)` }"><div v-if="rows[row.index]?.heading" class="timeline-group"><span class="timeline-point" /><h2>{{ rows[row.index]?.heading }}</h2></div><EventCard :event="rows[row.index]!.event" :basis="filters.basis" /></div></div><div class="list-end"><q-spinner v-if="loadingMore" color="primary" /><q-btn v-else-if="events.length < total" flat no-caps label="Load more" @click="loadMore" /><span v-else>You’re all caught up with this view.</span></div></div>
       </section>
       <aside class="tba-aside"><div class="section-caption"><span>STILL A POSSIBILITY</span><span>{{ tbaCount }}</span></div><div class="tba-intro"><span class="tba-spark">✧</span><h2>Dates to be announced</h2><p>Confirmed plans and early signals, waiting for a place on the calendar.</p></div><q-skeleton v-if="loading" height="120px" /><template v-else><EventCard v-for="event in undated" :key="event.id" :event="event" compact /><div v-if="!undated.length" class="tba-empty">No undated events in this view.</div><p v-if="tbaCount > undated.length" class="muted">Showing {{ undated.length }} of {{ tbaCount }}. Narrow the filters to find a story.</p></template><div class="source-note"><q-icon name="verified_user" /><div><strong>Follow the evidence</strong><p>Open any event to see its source, precision, and revision history.</p></div></div></aside>
     </div>

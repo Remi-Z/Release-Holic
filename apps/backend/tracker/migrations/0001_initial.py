@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Franchise',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('title', models.CharField(max_length=500)),
@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Creator',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('name', models.CharField(max_length=300)),
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Work',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('franchise', models.ForeignKey('tracker.franchise', null=True, blank=True, on_delete=models.SET_NULL, related_name='works')),
@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ExternalIdentity',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('work', models.ForeignKey('tracker.work', on_delete=models.CASCADE, related_name='identities')),
@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Unit',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('work', models.ForeignKey('tracker.work', on_delete=models.CASCADE, related_name='units')),
@@ -89,7 +89,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Edition',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('work', models.ForeignKey('tracker.work', on_delete=models.CASCADE, related_name='editions')),
@@ -113,7 +113,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='SourceDocument',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('owner', models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)),
@@ -134,7 +134,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Relationship',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('from_work', models.ForeignKey('tracker.work', on_delete=models.CASCADE, related_name='outgoing_relationships')),
@@ -150,7 +150,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Event',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('owner', models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)),
@@ -186,7 +186,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Claim',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('source', models.ForeignKey('tracker.sourcedocument', on_delete=models.PROTECT, related_name='claims')),
@@ -203,7 +203,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='EventRevision',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('event', models.ForeignKey('tracker.event', on_delete=models.CASCADE, related_name='revisions')),
@@ -217,7 +217,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Follow',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('owner', models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='follows')),
@@ -235,7 +235,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='SavedFilter',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('owner', models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
@@ -246,7 +246,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='AdapterState',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('identity', models.OneToOneField('tracker.externalidentity', on_delete=models.CASCADE, related_name='adapter_state')),
@@ -262,7 +262,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='IngestionRun',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('owner', models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)),
@@ -278,7 +278,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ModelConfig',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('owner', models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
@@ -306,7 +306,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ReviewProposal',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('owner', models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
@@ -326,7 +326,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='FeedSubscription',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('owner', models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
@@ -344,7 +344,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='APIToken',
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)),
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('owner', models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),

@@ -1,43 +1,337 @@
-name: Acceptance checks
-on: [push, pull_request]
+name: CI and container releases
+
+"on":
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  prepare:
+    name: Validate release policy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      backend_image: ${{ steps.release.outputs.backend_image }}
+      web_image: ${{ steps.release.outputs.web_image }}
+      publish: ${{ steps.release.outputs.publish }}
+      release: ${{ steps.release.outputs.release }}
+      prerelease: ${{ steps.release.outputs.prerelease }}
+      tag: ${{ steps.release.outputs.tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Test release policy
+        run: python3 -m unittest discover -s scripts/tests -v
+      - name: Resolve image names and validate version tags
+        id: release
+        run: python3 scripts/release_metadata.py --output "$GITHUB_OUTPUT"
+
   backend:
-    runs-on: ubuntu-latest
+    name: Backend and PostgreSQL
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     env:
       DEBUG: '1'
       DJANGO_SECRET_KEY: ci-only-test-key
+      DATABASE_URL: postgres://releaseholic:ci-only-database@127.0.0.1:5432/releaseholic
+      TEST_DATABASE_URL: postgres://releaseholic:ci-only-database@127.0.0.1:5432/releaseholic
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: releaseholic
+          POSTGRES_USER: releaseholic
+          POSTGRES_PASSWORD: ci-only-database
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U releaseholic -d releaseholic"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    defaults:
+      run:
+        working-directory: apps/backend
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
-        with: {python-version: '3.12'}
-      - run: uv sync
-        working-directory: apps/backend
-      - run: uv run python manage.py check
-        working-directory: apps/backend
-      - run: uv run python manage.py makemigrations --check --dry-run
-        working-directory: apps/backend
-      - run: uv run pytest
-        working-directory: apps/backend
-      - run: uv run python ../../scripts/generate_contracts.py
-        working-directory: apps/backend
-      - run: git diff --exit-code -- packages/contracts/schema.json apps/web/src/api/contracts.ts
-      - run: uv run python manage.py export_openapi --output /tmp/release-holic-openapi.json
-        working-directory: apps/backend
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: '0.12.23'
+          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: 'apps/backend/uv.lock'
+      - name: Install backend dependencies
+        run: |
+          if [ -f uv.lock ]; then uv sync --frozen; else uv sync; fi
+      - name: Save the dependency lock used by the tests
+        if: ${{ always() && hashFiles('apps/backend/uv.lock') != '' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: backend-dependencies
+          path: apps/backend/uv.lock
+          retention-days: 7
+          overwrite: true
+      - name: Check Django and migration drift
+        run: |
+          uv run --frozen python manage.py check
+          uv run --frozen python manage.py makemigrations --check --dry-run --verbosity 3
+          uv run --frozen python manage.py migrate --noinput
+      - name: Run backend acceptance tests against PostgreSQL
+        run: uv run --frozen pytest --junitxml=reports/pytest.xml
+      - name: Check generated API contracts
+        run: |
+          uv run --frozen python ../../scripts/generate_contracts.py
+          git diff --exit-code -- ../../packages/contracts/schema.json ../web/src/api/contracts.ts
+          uv run --frozen python manage.py export_openapi --output reports/openapi.json
+      - name: Upload backend reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: backend-reports
+          path: apps/backend/reports
+          if-no-files-found: ignore
+          retention-days: 14
+          overwrite: true
+
   client:
-    runs-on: ubuntu-latest
+    name: Web and mobile browser checks
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     env:
       ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+    defaults:
+      run:
+        working-directory: apps/web
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: {node-version: '22'}
-      - run: npm install
-        working-directory: apps/web
-      - run: npm run typecheck
-        working-directory: apps/web
-      - run: npm run build && npm run build:pwa
-        working-directory: apps/web
-      - run: npx playwright install --with-deps chromium
-        working-directory: apps/web
-      - run: npm run test:e2e
-        working-directory: apps/web
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+      - name: Install client dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - name: Save the dependency lock used by the tests
+        if: ${{ always() && hashFiles('apps/web/package-lock.json') != '' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: client-dependencies
+          path: apps/web/package-lock.json
+          retention-days: 7
+          overwrite: true
+      - name: Typecheck and build SPA/PWA clients
+        run: |
+          npm run typecheck
+          npm run build
+          npm run build:pwa
+      - name: Install the browser used by UI tests
+        run: npx playwright install --with-deps chromium
+      - name: Test desktop and mobile browser flows
+        run: npm run test:e2e
+      - name: Upload browser failure traces
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: browser-traces
+          path: apps/web/test-results
+          if-no-files-found: ignore
+          retention-days: 14
+          overwrite: true
+
+  containers:
+    name: Test and publish Docker images
+    needs: [prepare, backend, client]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions:
+      contents: read
+      packages: write
+    env:
+      BACKEND_IMAGE: release-holic-backend
+      WEB_IMAGE: release-holic-web
+      IMAGE_TAG: ci
+      COMPOSE_PROJECT_NAME: release-holic-ci-${{ github.run_id }}
+      DOCKER_METADATA_SHORT_SHA_LENGTH: '40'
+    outputs:
+      backend_digest: ${{ steps.publish_backend.outputs.digest }}
+      web_digest: ${{ steps.publish_web.outputs.digest }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Use the exact Python dependencies that passed acceptance tests
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: backend-dependencies
+          path: apps/backend
+      - name: Use the exact client dependencies that passed acceptance tests
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: client-dependencies
+          path: apps/web
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Backend image metadata
+        id: backend_meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ${{ needs.prepare.outputs.backend_image }}
+          flavor: latest=false
+          tags: |
+            type=sha,format=long
+            type=raw,value=main,enable=${{ github.ref == 'refs/heads/main' }}
+            type=ref,event=tag
+            type=semver,pattern={{version}},enable=${{ needs.prepare.outputs.release == 'true' }}
+            type=raw,value=latest,enable=${{ needs.prepare.outputs.release == 'true' && needs.prepare.outputs.prerelease == 'false' }}
+      - name: Web image metadata
+        id: web_meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ${{ needs.prepare.outputs.web_image }}
+          flavor: latest=false
+          tags: |
+            type=sha,format=long
+            type=raw,value=main,enable=${{ github.ref == 'refs/heads/main' }}
+            type=ref,event=tag
+            type=semver,pattern={{version}},enable=${{ needs.prepare.outputs.release == 'true' }}
+            type=raw,value=latest,enable=${{ needs.prepare.outputs.release == 'true' && needs.prepare.outputs.prerelease == 'false' }}
+      - name: Build backend and worker image for testing
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: apps/backend/Dockerfile
+          platforms: linux/amd64
+          load: true
+          tags: release-holic-backend:ci
+          labels: ${{ steps.backend_meta.outputs.labels }}
+          cache-from: type=gha,scope=backend
+      - name: Build web image for testing
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          platforms: linux/amd64
+          load: true
+          tags: release-holic-web:ci
+          labels: ${{ steps.web_meta.outputs.labels }}
+          cache-from: type=gha,scope=web
+      - name: Start the complete packaged stack
+        run: |
+          cp .env.example .env
+          docker compose -f compose.images.yaml up -d
+      - name: Exercise the API, PWA, database, worker, and Chromium
+        run: python3 scripts/check_stack.py
+      - name: Log in to GitHub Container Registry
+        if: needs.prepare.outputs.publish == 'true'
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish the tested backend image
+        id: publish_backend
+        if: needs.prepare.outputs.publish == 'true'
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: apps/backend/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.backend_meta.outputs.tags }}
+          labels: ${{ steps.backend_meta.outputs.labels }}
+          provenance: mode=max
+          sbom: true
+          cache-to: type=gha,mode=max,scope=backend
+      - name: Publish the tested web image
+        id: publish_web
+        if: needs.prepare.outputs.publish == 'true'
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.web_meta.outputs.tags }}
+          labels: ${{ steps.web_meta.outputs.labels }}
+          provenance: mode=max
+          sbom: true
+          cache-to: type=gha,mode=max,scope=web
+      - name: Verify the images exist in the registry
+        if: needs.prepare.outputs.publish == 'true'
+        env:
+          PUBLISHED_BACKEND: ${{ needs.prepare.outputs.backend_image }}@${{ steps.publish_backend.outputs.digest }}
+          PUBLISHED_WEB: ${{ needs.prepare.outputs.web_image }}@${{ steps.publish_web.outputs.digest }}
+        run: |
+          docker buildx imagetools inspect "$PUBLISHED_BACKEND"
+          docker buildx imagetools inspect "$PUBLISHED_WEB"
+      - name: Record published image digests
+        if: needs.prepare.outputs.publish == 'true'
+        env:
+          BACKEND_DIGEST: ${{ steps.publish_backend.outputs.digest }}
+          WEB_DIGEST: ${{ steps.publish_web.outputs.digest }}
+        run: |
+          python3 scripts/release_metadata.py --manifest
+          cat release-notes.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Save the immutable release manifest
+        if: needs.prepare.outputs.publish == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: container-manifest
+          path: |
+            release-manifest.json
+            release-notes.md
+          retention-days: 30
+          overwrite: true
+      - name: Collect container diagnostics
+        if: always()
+        run: docker compose -f compose.images.yaml logs --no-color > container-logs.txt
+      - name: Save container diagnostics
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: container-logs
+          path: container-logs.txt
+          retention-days: 7
+          overwrite: true
+      - name: Stop CI containers and remove their test volumes
+        if: always()
+        run: docker compose -f compose.images.yaml down -v
+
+  release:
+    name: Create versioned GitHub release
+    needs: [prepare, containers]
+    if: needs.prepare.outputs.release == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
+      IS_PRERELEASE: ${{ needs.prepare.outputs.prerelease }}
+    steps:
+      - name: Download verified image digests and release notes
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: container-manifest
+      - name: Create the release or refresh its manifest on a rerun
+        run: |
+          if gh release view "$RELEASE_TAG" > /dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" release-manifest.json --clobber
+          else
+            gh release create "$RELEASE_TAG" release-manifest.json \
+              --verify-tag --title "$RELEASE_TAG" --generate-notes \
+              --notes-file release-notes.md --prerelease="$IS_PRERELEASE"
+          fi
