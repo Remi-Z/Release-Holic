@@ -143,7 +143,11 @@ def test_partial_year_intersects_month_filter_and_undated_stays_tba(users, alice
     assert len(dated['events']) == 1
     assert dated['events'][0]['precision'] == 'year'
     undated = alice.get('/api/timeline?tba_only=true').json()
-    assert len(undated['events']) == 1 and undated['events'][0]['window_start'] is None
+    # Publication is unknown, so both the sequel claim and its independent
+    # projected release remain undated. Neither can invent a calendar date.
+    assert {event['kind'] for event in undated['events']} == {'sequel', 'release'}
+    assert len(undated['events']) == 2
+    assert all(event['precision'] == 'unknown' and event['window_start'] is None for event in undated['events'])
 
 
 def test_local_day_filter_matches_instant_without_shifting_calendar_dates(users, alice, work):
