@@ -1,0 +1,13 @@
+.git
+.env
+**/.venv
+**/node_modules
+**/__pycache__
+**/.quasar
+**/dist
+**/*.sqlite3
+**/.pytest_cache
+**/.ruff_cache
+**/test-results
+**/playwright-report
+**/staticfiles

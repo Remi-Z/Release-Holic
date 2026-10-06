@@ -1,0 +1,43 @@
+name: Acceptance checks
+on: [push, pull_request]
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    env:
+      DEBUG: '1'
+      DJANGO_SECRET_KEY: ci-only-test-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with: {python-version: '3.12'}
+      - run: uv sync
+        working-directory: apps/backend
+      - run: uv run python manage.py check
+        working-directory: apps/backend
+      - run: uv run python manage.py makemigrations --check --dry-run
+        working-directory: apps/backend
+      - run: uv run pytest
+        working-directory: apps/backend
+      - run: uv run python ../../scripts/generate_contracts.py
+        working-directory: apps/backend
+      - run: git diff --exit-code -- packages/contracts/schema.json apps/web/src/api/contracts.ts
+      - run: uv run python manage.py export_openapi --output /tmp/release-holic-openapi.json
+        working-directory: apps/backend
+  client:
+    runs-on: ubuntu-latest
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: npm install
+        working-directory: apps/web
+      - run: npm run typecheck
+        working-directory: apps/web
+      - run: npm run build && npm run build:pwa
+        working-directory: apps/web
+      - run: npx playwright install --with-deps chromium
+        working-directory: apps/web
+      - run: npm run test:e2e
+        working-directory: apps/web

@@ -1,0 +1,38 @@
+{
+  "name": "release-holic-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "quasar dev",
+    "build": "quasar build",
+    "build:pwa": "quasar build -m pwa",
+    "dev:electron": "quasar dev -m electron",
+    "build:electron": "quasar build -m electron",
+    "dev:android": "quasar dev -m capacitor -T android",
+    "dev:ios": "quasar dev -m capacitor -T ios",
+    "build:android": "quasar build -m capacitor -T android",
+    "build:ios": "quasar build -m capacitor -T ios",
+    "typecheck": "vue-tsc --noEmit",
+    "test:e2e": "playwright test",
+    "postinstall": "quasar prepare"
+  },
+  "dependencies": {
+    "@quasar/extras": "^1.16.0",
+    "@tanstack/vue-virtual": "^3.13.0",
+    "quasar": "^2.18.0",
+    "register-service-worker": "^1.7.2",
+    "vue": "^3.5.0",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@quasar/app-vite": "^2.1.0",
+    "@playwright/test": "^1.51.0",
+    "@types/node": "^22.13.0",
+    "typescript": "~5.8.3",
+    "vue-tsc": "^2.2.0",
+    "electron": "^40.0.0",
+    "electron-builder": "^26.0.0"
+  },
+  "engines": { "node": ">=22.13.0" }
+}

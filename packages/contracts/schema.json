@@ -1,0 +1,1887 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "UserOut": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "integer"
+        },
+        "username": {
+          "title": "Username",
+          "type": "string"
+        },
+        "is_staff": {
+          "title": "Is Staff",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "username",
+        "is_staff"
+      ],
+      "title": "UserOut",
+      "type": "object"
+    },
+    "LoginIn": {
+      "additionalProperties": false,
+      "properties": {
+        "username": {
+          "maxLength": 150,
+          "minLength": 1,
+          "title": "Username",
+          "type": "string"
+        },
+        "password": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Password",
+          "type": "string"
+        }
+      },
+      "required": [
+        "username",
+        "password"
+      ],
+      "title": "LoginIn",
+      "type": "object"
+    },
+    "LoginOut": {
+      "properties": {
+        "token": {
+          "title": "Token",
+          "type": "string"
+        },
+        "user": {
+          "$ref": "#/$defs/UserOut"
+        }
+      },
+      "required": [
+        "token",
+        "user"
+      ],
+      "title": "LoginOut",
+      "type": "object"
+    },
+    "FranchiseOut": {
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title"
+      ],
+      "title": "FranchiseOut",
+      "type": "object"
+    },
+    "IdentityOut": {
+      "properties": {
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "namespace": {
+          "title": "Namespace",
+          "type": "string"
+        },
+        "external_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "External Id",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "provider",
+        "namespace",
+        "external_id",
+        "id"
+      ],
+      "title": "IdentityOut",
+      "type": "object"
+    },
+    "WorkOut": {
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "original_title": {
+          "title": "Original Title",
+          "type": "string"
+        },
+        "aliases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Aliases",
+          "type": "array"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "creators": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Creators",
+          "type": "array"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "canonical_url": {
+          "title": "Canonical Url",
+          "type": "string"
+        },
+        "image_url": {
+          "title": "Image Url",
+          "type": "string"
+        },
+        "franchise_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Franchise Id"
+        },
+        "franchise_title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Franchise Title"
+        },
+        "identities": {
+          "items": {
+            "$ref": "#/$defs/IdentityOut"
+          },
+          "title": "Identities",
+          "type": "array"
+        },
+        "unit_count": {
+          "title": "Unit Count",
+          "type": "integer"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "title": "Metadata",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "original_title",
+        "aliases",
+        "kind",
+        "creators",
+        "summary",
+        "language",
+        "status",
+        "canonical_url",
+        "image_url",
+        "franchise_id",
+        "franchise_title",
+        "identities",
+        "unit_count",
+        "metadata"
+      ],
+      "title": "WorkOut",
+      "type": "object"
+    },
+    "EditionOut": {
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "isbn": {
+          "title": "Isbn",
+          "type": "string"
+        },
+        "volume_label": {
+          "title": "Volume Label",
+          "type": "string"
+        },
+        "publisher": {
+          "title": "Publisher",
+          "type": "string"
+        },
+        "imprint": {
+          "title": "Imprint",
+          "type": "string"
+        },
+        "format": {
+          "title": "Format",
+          "type": "string"
+        },
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "release_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Release Date"
+        },
+        "canonical_url": {
+          "title": "Canonical Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "isbn",
+        "volume_label",
+        "publisher",
+        "imprint",
+        "format",
+        "language",
+        "release_date",
+        "canonical_url"
+      ],
+      "title": "EditionOut",
+      "type": "object"
+    },
+    "RelationshipOut": {
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "from_work_id": {
+          "format": "uuid",
+          "title": "From Work Id",
+          "type": "string"
+        },
+        "to_work_id": {
+          "format": "uuid",
+          "title": "To Work Id",
+          "type": "string"
+        },
+        "from_title": {
+          "title": "From Title",
+          "type": "string"
+        },
+        "to_title": {
+          "title": "To Title",
+          "type": "string"
+        },
+        "verification": {
+          "title": "Verification",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "from_work_id",
+        "to_work_id",
+        "from_title",
+        "to_title",
+        "verification"
+      ],
+      "title": "RelationshipOut",
+      "type": "object"
+    },
+    "UnitOut": {
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "external_id": {
+          "title": "External Id",
+          "type": "string"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "ordinal": {
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "canonical_url": {
+          "title": "Canonical Url",
+          "type": "string"
+        },
+        "active": {
+          "title": "Active",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "provider",
+        "external_id",
+        "kind",
+        "title",
+        "label",
+        "ordinal",
+        "canonical_url",
+        "active"
+      ],
+      "title": "UnitOut",
+      "type": "object"
+    },
+    "WorkDetailOut": {
+      "properties": {
+        "work": {
+          "$ref": "#/$defs/WorkOut"
+        },
+        "units": {
+          "items": {
+            "$ref": "#/$defs/UnitOut"
+          },
+          "title": "Units",
+          "type": "array"
+        },
+        "editions": {
+          "items": {
+            "$ref": "#/$defs/EditionOut"
+          },
+          "title": "Editions",
+          "type": "array"
+        },
+        "relationships": {
+          "items": {
+            "$ref": "#/$defs/RelationshipOut"
+          },
+          "title": "Relationships",
+          "type": "array"
+        }
+      },
+      "required": [
+        "work",
+        "units",
+        "editions",
+        "relationships"
+      ],
+      "title": "WorkDetailOut",
+      "type": "object"
+    },
+    "Candidate": {
+      "properties": {
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "namespace": {
+          "title": "Namespace",
+          "type": "string"
+        },
+        "external_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "External Id",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "creators": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Creators",
+          "type": "array"
+        },
+        "year": {
+          "default": "",
+          "title": "Year",
+          "type": "string"
+        },
+        "url": {
+          "default": "",
+          "title": "Url",
+          "type": "string"
+        },
+        "existing_work_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Existing Work Id"
+        }
+      },
+      "required": [
+        "provider",
+        "namespace",
+        "external_id",
+        "title",
+        "kind"
+      ],
+      "title": "Candidate",
+      "type": "object"
+    },
+    "SearchOut": {
+      "properties": {
+        "candidates": {
+          "items": {
+            "$ref": "#/$defs/Candidate"
+          },
+          "title": "Candidates",
+          "type": "array"
+        },
+        "errors": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Errors",
+          "type": "array"
+        }
+      },
+      "required": [
+        "candidates",
+        "errors"
+      ],
+      "title": "SearchOut",
+      "type": "object"
+    },
+    "ImportIn": {
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "maxLength": 50,
+          "title": "Provider",
+          "type": "string"
+        },
+        "namespace": {
+          "maxLength": 50,
+          "title": "Namespace",
+          "type": "string"
+        },
+        "external_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "External Id",
+          "type": "string"
+        },
+        "include_related": {
+          "default": false,
+          "title": "Include Related",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "provider",
+        "namespace",
+        "external_id"
+      ],
+      "title": "ImportIn",
+      "type": "object"
+    },
+    "RunOut": {
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "work_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Work Id"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "finished_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Finished At"
+        }
+      },
+      "required": [
+        "id",
+        "work_id",
+        "provider",
+        "status",
+        "message",
+        "created_at",
+        "finished_at"
+      ],
+      "title": "RunOut",
+      "type": "object"
+    },
+    "FollowIn": {
+      "additionalProperties": false,
+      "properties": {
+        "work_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Work Id"
+        },
+        "franchise_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Franchise Id"
+        },
+        "include_related": {
+          "default": false,
+          "title": "Include Related",
+          "type": "boolean"
+        }
+      },
+      "title": "FollowIn",
+      "type": "object"
+    },
+    "ProgressIn": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "planned",
+            "in_progress",
+            "completed",
+            "paused",
+            "dropped"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "progress": {
+          "maximum": 1000000,
+          "minimum": 0,
+          "title": "Progress",
+          "type": "integer"
+        },
+        "include_related": {
+          "title": "Include Related",
+          "type": "boolean"
+        },
+        "progress_kind": {
+          "enum": [
+            "episode",
+            "chapter",
+            "volume"
+          ],
+          "title": "Progress Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "progress",
+        "include_related",
+        "progress_kind"
+      ],
+      "title": "ProgressIn",
+      "type": "object"
+    },
+    "FollowOut": {
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "work": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WorkOut"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "franchise_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Franchise Id"
+        },
+        "franchise_title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Franchise Title"
+        },
+        "include_related": {
+          "title": "Include Related",
+          "type": "boolean"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "progress": {
+          "title": "Progress",
+          "type": "integer"
+        },
+        "progress_kind": {
+          "title": "Progress Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "work",
+        "franchise_id",
+        "franchise_title",
+        "include_related",
+        "status",
+        "progress",
+        "progress_kind"
+      ],
+      "title": "FollowOut",
+      "type": "object"
+    },
+    "EventOut": {
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "work_id": {
+          "format": "uuid",
+          "title": "Work Id",
+          "type": "string"
+        },
+        "work_title": {
+          "title": "Work Title",
+          "type": "string"
+        },
+        "work_kind": {
+          "title": "Work Kind",
+          "type": "string"
+        },
+        "franchise_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Franchise Id"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "verification": {
+          "title": "Verification",
+          "type": "string"
+        },
+        "lifecycle": {
+          "title": "Lifecycle",
+          "type": "string"
+        },
+        "precision": {
+          "title": "Precision",
+          "type": "string"
+        },
+        "date_label": {
+          "title": "Date Label",
+          "type": "string"
+        },
+        "scheduled_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Scheduled At"
+        },
+        "window_start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Window Start"
+        },
+        "window_end": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Window End"
+        },
+        "source_timezone": {
+          "title": "Source Timezone",
+          "type": "string"
+        },
+        "region": {
+          "title": "Region",
+          "type": "string"
+        },
+        "platform": {
+          "title": "Platform",
+          "type": "string"
+        },
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Published At"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "evidence_count": {
+          "title": "Evidence Count",
+          "type": "integer"
+        },
+        "personal": {
+          "title": "Personal",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "work_id",
+        "work_title",
+        "work_kind",
+        "franchise_id",
+        "kind",
+        "title",
+        "summary",
+        "verification",
+        "lifecycle",
+        "precision",
+        "date_label",
+        "scheduled_at",
+        "window_start",
+        "window_end",
+        "source_timezone",
+        "region",
+        "platform",
+        "language",
+        "published_at",
+        "observed_at",
+        "provider",
+        "evidence_count",
+        "personal"
+      ],
+      "title": "EventOut",
+      "type": "object"
+    },
+    "TimelineOut": {
+      "properties": {
+        "events": {
+          "items": {
+            "$ref": "#/$defs/EventOut"
+          },
+          "title": "Events",
+          "type": "array"
+        },
+        "total": {
+          "title": "Total",
+          "type": "integer"
+        },
+        "tba_count": {
+          "title": "Tba Count",
+          "type": "integer"
+        },
+        "offset": {
+          "title": "Offset",
+          "type": "integer"
+        },
+        "limit": {
+          "title": "Limit",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "events",
+        "total",
+        "tba_count",
+        "offset",
+        "limit"
+      ],
+      "title": "TimelineOut",
+      "type": "object"
+    },
+    "EvidenceOut": {
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "locator": {
+          "title": "Locator",
+          "type": "string"
+        },
+        "original_text": {
+          "title": "Original Text",
+          "type": "string"
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Published At"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "url",
+        "provider",
+        "title",
+        "locator",
+        "original_text",
+        "published_at",
+        "observed_at"
+      ],
+      "title": "EvidenceOut",
+      "type": "object"
+    },
+    "RevisionOut": {
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "before": {
+          "additionalProperties": true,
+          "title": "Before",
+          "type": "object"
+        },
+        "after": {
+          "additionalProperties": true,
+          "title": "After",
+          "type": "object"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "before",
+        "after",
+        "reason",
+        "created_at"
+      ],
+      "title": "RevisionOut",
+      "type": "object"
+    },
+    "EventDetailOut": {
+      "properties": {
+        "event": {
+          "$ref": "#/$defs/EventOut"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceOut"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "revisions": {
+          "items": {
+            "$ref": "#/$defs/RevisionOut"
+          },
+          "title": "Revisions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "event",
+        "evidence",
+        "revisions"
+      ],
+      "title": "EventDetailOut",
+      "type": "object"
+    },
+    "StatsOut": {
+      "properties": {
+        "followed": {
+          "title": "Followed",
+          "type": "integer"
+        },
+        "upcoming": {
+          "title": "Upcoming",
+          "type": "integer"
+        },
+        "needs_review": {
+          "title": "Needs Review",
+          "type": "integer"
+        },
+        "stale_sources": {
+          "title": "Stale Sources",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "followed",
+        "upcoming",
+        "needs_review",
+        "stale_sources"
+      ],
+      "title": "StatsOut",
+      "type": "object"
+    },
+    "SourceOut": {
+      "properties": {
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "policy": {
+          "title": "Policy",
+          "type": "string"
+        }
+      },
+      "required": [
+        "provider",
+        "status",
+        "policy"
+      ],
+      "title": "SourceOut",
+      "type": "object"
+    },
+    "SourceStateOut": {
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "work_id": {
+          "format": "uuid",
+          "title": "Work Id",
+          "type": "string"
+        },
+        "work_title": {
+          "title": "Work Title",
+          "type": "string"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "last_checked_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Last Checked At"
+        },
+        "last_success_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Last Success At"
+        },
+        "last_error": {
+          "title": "Last Error",
+          "type": "string"
+        },
+        "diagnostics": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Diagnostics",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "work_id",
+        "work_title",
+        "provider",
+        "last_checked_at",
+        "last_success_at",
+        "last_error",
+        "diagnostics"
+      ],
+      "title": "SourceStateOut",
+      "type": "object"
+    },
+    "SourcesOut": {
+      "properties": {
+        "adapters": {
+          "items": {
+            "$ref": "#/$defs/SourceOut"
+          },
+          "title": "Adapters",
+          "type": "array"
+        },
+        "states": {
+          "items": {
+            "$ref": "#/$defs/SourceStateOut"
+          },
+          "title": "States",
+          "type": "array"
+        }
+      },
+      "required": [
+        "adapters",
+        "states"
+      ],
+      "title": "SourcesOut",
+      "type": "object"
+    },
+    "FilterIn": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "filters": {
+          "additionalProperties": true,
+          "title": "Filters",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name",
+        "filters"
+      ],
+      "title": "FilterIn",
+      "type": "object"
+    },
+    "FilterOut": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "filters": {
+          "additionalProperties": true,
+          "title": "Filters",
+          "type": "object"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "filters",
+        "id"
+      ],
+      "title": "FilterOut",
+      "type": "object"
+    },
+    "ArticleIn": {
+      "additionalProperties": false,
+      "properties": {
+        "work_id": {
+          "format": "uuid",
+          "title": "Work Id",
+          "type": "string"
+        },
+        "url": {
+          "maxLength": 2000,
+          "title": "Url",
+          "type": "string"
+        },
+        "use_model": {
+          "default": false,
+          "title": "Use Model",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "work_id",
+        "url"
+      ],
+      "title": "ArticleIn",
+      "type": "object"
+    },
+    "ModelIn": {
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "enum": [
+            "openai-compatible",
+            "openai",
+            "anthropic",
+            "google",
+            "ollama"
+          ],
+          "title": "Provider",
+          "type": "string"
+        },
+        "endpoint": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Endpoint",
+          "type": "string"
+        },
+        "model": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Model",
+          "type": "string"
+        },
+        "credential": {
+          "anyOf": [
+            {
+              "maxLength": 10000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Credential"
+        },
+        "max_input_chars": {
+          "default": 12000,
+          "maximum": 30000,
+          "minimum": 1000,
+          "title": "Max Input Chars",
+          "type": "integer"
+        },
+        "max_output_tokens": {
+          "default": 2000,
+          "maximum": 8000,
+          "minimum": 100,
+          "title": "Max Output Tokens",
+          "type": "integer"
+        },
+        "daily_requests": {
+          "default": 20,
+          "maximum": 1000,
+          "minimum": 1,
+          "title": "Daily Requests",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "provider",
+        "endpoint",
+        "model"
+      ],
+      "title": "ModelIn",
+      "type": "object"
+    },
+    "ModelOut": {
+      "properties": {
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "endpoint": {
+          "title": "Endpoint",
+          "type": "string"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "has_credential": {
+          "title": "Has Credential",
+          "type": "boolean"
+        },
+        "max_input_chars": {
+          "title": "Max Input Chars",
+          "type": "integer"
+        },
+        "max_output_tokens": {
+          "title": "Max Output Tokens",
+          "type": "integer"
+        },
+        "daily_requests": {
+          "title": "Daily Requests",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "provider",
+        "endpoint",
+        "model",
+        "has_credential",
+        "max_input_chars",
+        "max_output_tokens",
+        "daily_requests"
+      ],
+      "title": "ModelOut",
+      "type": "object"
+    },
+    "Precision": {
+      "enum": [
+        "instant",
+        "day",
+        "month",
+        "season",
+        "year",
+        "unknown"
+      ],
+      "title": "Precision",
+      "type": "string"
+    },
+    "ReleaseTime": {
+      "properties": {
+        "precision": {
+          "$ref": "#/$defs/Precision",
+          "default": "unknown"
+        },
+        "start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start"
+        },
+        "end": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End"
+        },
+        "timestamp": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timestamp"
+        },
+        "label": {
+          "default": "",
+          "maxLength": 200,
+          "title": "Label",
+          "type": "string"
+        },
+        "timezone": {
+          "default": "",
+          "maxLength": 50,
+          "title": "Timezone",
+          "type": "string"
+        }
+      },
+      "title": "ReleaseTime",
+      "type": "object"
+    },
+    "SourceEvent": {
+      "properties": {
+        "external_key": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "External Key",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "announcement",
+            "release",
+            "episode_release",
+            "chapter_release",
+            "volume_release",
+            "availability",
+            "pv",
+            "rumour",
+            "sequel",
+            "adaptation",
+            "delay",
+            "cancellation",
+            "metadata_change"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "summary": {
+          "default": "",
+          "maxLength": 10000,
+          "title": "Summary",
+          "type": "string"
+        },
+        "release": {
+          "$ref": "#/$defs/ReleaseTime"
+        },
+        "verification": {
+          "default": "reported",
+          "enum": [
+            "confirmed",
+            "reported",
+            "unverified",
+            "contradicted",
+            "retracted"
+          ],
+          "title": "Verification",
+          "type": "string"
+        },
+        "lifecycle": {
+          "default": "scheduled",
+          "enum": [
+            "announced",
+            "scheduled",
+            "released",
+            "delayed",
+            "cancelled"
+          ],
+          "title": "Lifecycle",
+          "type": "string"
+        },
+        "region": {
+          "default": "",
+          "maxLength": 10,
+          "title": "Region",
+          "type": "string"
+        },
+        "platform": {
+          "default": "",
+          "maxLength": 100,
+          "title": "Platform",
+          "type": "string"
+        },
+        "language": {
+          "default": "",
+          "maxLength": 20,
+          "title": "Language",
+          "type": "string"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "locator": {
+          "default": "",
+          "maxLength": 1000,
+          "title": "Locator",
+          "type": "string"
+        },
+        "original_text": {
+          "default": "",
+          "maxLength": 12000,
+          "title": "Original Text",
+          "type": "string"
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Published At"
+        },
+        "unit_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit Id"
+        },
+        "product_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Product Id"
+        }
+      },
+      "required": [
+        "external_key",
+        "kind",
+        "title",
+        "url"
+      ],
+      "title": "SourceEvent",
+      "type": "object"
+    },
+    "ReviewOut": {
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "work_id": {
+          "format": "uuid",
+          "title": "Work Id",
+          "type": "string"
+        },
+        "work_title": {
+          "title": "Work Title",
+          "type": "string"
+        },
+        "source_url": {
+          "title": "Source Url",
+          "type": "string"
+        },
+        "excerpt": {
+          "title": "Excerpt",
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/SourceEvent"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "work_id",
+        "work_title",
+        "source_url",
+        "excerpt",
+        "payload",
+        "model",
+        "status",
+        "message",
+        "created_at"
+      ],
+      "title": "ReviewOut",
+      "type": "object"
+    },
+    "ReviewIn": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "enum": [
+            "approve",
+            "reject"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "payload": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceEvent"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "action"
+      ],
+      "title": "ReviewIn",
+      "type": "object"
+    },
+    "FeedIn": {
+      "additionalProperties": false,
+      "properties": {
+        "work_id": {
+          "format": "uuid",
+          "title": "Work Id",
+          "type": "string"
+        },
+        "url": {
+          "maxLength": 2000,
+          "title": "Url",
+          "type": "string"
+        },
+        "source_kind": {
+          "default": "rss",
+          "enum": [
+            "rss",
+            "youtube",
+            "apple",
+            "netflix",
+            "disney"
+          ],
+          "title": "Source Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "work_id",
+        "url"
+      ],
+      "title": "FeedIn",
+      "type": "object"
+    },
+    "FeedOut": {
+      "additionalProperties": false,
+      "properties": {
+        "work_id": {
+          "format": "uuid",
+          "title": "Work Id",
+          "type": "string"
+        },
+        "url": {
+          "maxLength": 2000,
+          "title": "Url",
+          "type": "string"
+        },
+        "source_kind": {
+          "default": "rss",
+          "enum": [
+            "rss",
+            "youtube",
+            "apple",
+            "netflix",
+            "disney"
+          ],
+          "title": "Source Kind",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "last_checked_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Last Checked At"
+        },
+        "last_error": {
+          "title": "Last Error",
+          "type": "string"
+        }
+      },
+      "required": [
+        "work_id",
+        "url",
+        "id",
+        "last_checked_at",
+        "last_error"
+      ],
+      "title": "FeedOut",
+      "type": "object"
+    },
+    "StatusOut": {
+      "properties": {
+        "ok": {
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "message": {
+          "default": "",
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ok"
+      ],
+      "title": "StatusOut",
+      "type": "object"
+    },
+    "WorkCorrectionIn": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "aliases": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100,
+          "title": "Aliases",
+          "type": "array"
+        },
+        "franchise_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Franchise Id"
+        }
+      },
+      "required": [
+        "title",
+        "aliases"
+      ],
+      "title": "WorkCorrectionIn",
+      "type": "object"
+    }
+  }
+}
