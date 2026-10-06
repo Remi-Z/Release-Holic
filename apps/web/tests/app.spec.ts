@@ -5,7 +5,7 @@ const eventId = '22222222-2222-4222-8222-222222222222';
 const event = { id: eventId, work_id: workId, work_title: 'Fixture story', work_kind: 'anime', franchise_id: null, kind: 'release', title: 'A release window', summary: 'A source has announced a year.', verification: 'reported', lifecycle: 'scheduled', precision: 'year', date_label: '2027', scheduled_at: null, window_start: '2027-01-01', window_end: '2027-12-31', source_timezone: '', region: 'JP', platform: '', language: 'ja', published_at: '2026-10-01T10:00:00Z', observed_at: '2026-10-02T10:00:00Z', provider: 'fixture', evidence_count: 1, personal: false };
 
 test.beforeEach(async ({ page }) => {
-  await page.route('**/api/**', async route => {
+  await page.route(url => url.pathname.startsWith('/api/'), async route => {
     const url = new URL(route.request().url());
     let body: unknown = {};
     if (url.pathname === '/api/auth/login') body = { token: 'test-token', user: { id: 1, username: 'fixture', is_staff: false } };

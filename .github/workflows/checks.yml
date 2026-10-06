@@ -71,8 +71,7 @@ jobs:
           enable-cache: true
           cache-dependency-glob: 'apps/backend/uv.lock'
       - name: Install backend dependencies
-        run: |
-          if [ -f uv.lock ]; then uv sync --frozen; else uv sync; fi
+        run: uv sync --frozen
       - name: Save the dependency lock used by the tests
         if: ${{ always() && hashFiles('apps/backend/uv.lock') != '' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -121,8 +120,7 @@ jobs:
         with:
           node-version: '22'
       - name: Install client dependencies
-        run: |
-          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+        run: npm ci
       - name: Save the dependency lock used by the tests
         if: ${{ always() && hashFiles('apps/web/package-lock.json') != '' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

@@ -61,4 +61,4 @@ The registry workflow publishes images and releases. Updating a running server r
 
 ## Dependencies and diagnostics
 
-The validation jobs install from checked-in lockfiles when present and upload those same locks for the Docker builds. The backend Dockerfile requires `uv.lock`; the web Dockerfile requires `package-lock.json`. CI artifacts also include API test reports/OpenAPI, failed browser traces, and container logs. The release policy's eight stdlib tests verify publication eligibility and stable/prerelease behavior.
+The validation jobs require the checked-in `uv.lock` and `package-lock.json`, install their frozen dependencies, and upload those same locks for the Docker builds. CI artifacts also include API test reports/OpenAPI, failed browser traces, and container logs. The release policy's eight stdlib tests verify publication eligibility and stable/prerelease behavior.
