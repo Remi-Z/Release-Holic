@@ -62,3 +62,5 @@ The registry workflow publishes images and releases. Updating a running server r
 ## Dependencies and diagnostics
 
 The validation jobs require the checked-in `uv.lock` and `package-lock.json`, install their frozen dependencies, and upload those same locks for the Docker builds. CI artifacts also include API test reports/OpenAPI, failed browser traces, and container logs. The release policy's eight stdlib tests verify publication eligibility and stable/prerelease behavior.
+
+Celery 5.6.3 or newer creates exclusive control and event queues for RabbitMQ 4 compatibility. These queues belong to each worker/client connection; ingestion task queues remain durable.

@@ -82,6 +82,10 @@ CELERY_TASK_TIME_LIMIT = 180
 CELERY_TASK_SOFT_TIME_LIMIT = 150
 CELERY_TASK_ALWAYS_EAGER = os.getenv("CELERY_TASK_ALWAYS_EAGER", "0") == "1"
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+# RabbitMQ 4 disallows non-durable, non-exclusive transient queues. Control
+# and event queues belong to one worker/client connection; task queues stay durable.
+CELERY_CONTROL_QUEUE_EXCLUSIVE = True
+CELERY_EVENT_QUEUE_EXCLUSIVE = True
 CELERY_TASK_PUBLISH_RETRY_POLICY = {"max_retries": 2, "interval_start": 0, "interval_step": 0.2, "interval_max": 0.5}
 CELERY_BROKER_CONNECTION_TIMEOUT = 3
 CELERY_BEAT_SCHEDULE = {"refresh-followed-works": {"task": "tracker.tasks.schedule_refreshes", "schedule": 900.0}}

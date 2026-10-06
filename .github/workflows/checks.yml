@@ -71,7 +71,7 @@ jobs:
           enable-cache: true
           cache-dependency-glob: 'apps/backend/uv.lock'
       - name: Install backend dependencies
-        run: uv sync --frozen
+        run: uv sync --locked
       - name: Save the dependency lock used by the tests
         if: ${{ always() && hashFiles('apps/backend/uv.lock') != '' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
