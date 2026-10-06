@@ -8,12 +8,21 @@ Implemented acceptance suites:
 - `tests/test_api.py`: real Django database/API tests for duplicate events/imports, postponed release revisions, timezone-equivalent polls, display-timezone day boundaries, separate announcement/release facts, regional overlap, TBA, ambiguous matches, franchise/relationship expansion, correction persistence, adapter failure retention, reviewed claim scope/one-time decisions, fabricated evidence, encrypted credentials, usage limits, invalid model output, and URL/redirect isolation.
 - `apps/web/tests/app.spec.ts`: controlled API fixtures in desktop/mobile Playwright projects for partial-date presentation, evidence inspection, ambiguous candidate selection, viewport fit, and mobile navigation. These are browser UI tests, not live ingestion tests.
 
-The pure domain suite passed in the implementation environment using Python 3.12 and Pydantic 2.13.4. The API JSON Schema and TypeScript model contract were generated from the same runtime.
+## GitHub Actions verification
 
-Python compilation passed for the backend, migration, tests, and scripts. The installed Playwright Babel parser accepted the TypeScript scripts and Vue directive/interpolation expressions: **25 files / 519 syntax checks**, with balanced Vue template tags. This checks syntax only; it cannot establish Vue/Quasar types, resolved imports, rendering, or runtime behavior.
+On 2026-10-06, [the release pipeline](https://github.com/Remi-Z/Release-Holic/actions/runs/37503008702) passed:
 
-The generated JSON Schema validates as Draft 2020-12, all 40 definition references resolve, and regenerating the contracts produces no changes. Static comparison confirms that the initial migration includes the field names from all 20 models; this does not replace Django's migration checks. `docker compose config --quiet`, JSON/TOML parsing, and source whitespace checks also pass. No application containers were started.
+- All **68 backend acceptance tests** using Python 3.12 and PostgreSQL 17, including stored HTML parsers and mocked provider integrations.
+- Django system checks, `makemigrations --check --dry-run`, and an actual PostgreSQL migration.
+- Regenerated JSON Schema/TypeScript contracts with no drift, plus OpenAPI export.
+- Client typecheck, SPA build, and PWA build using Node 22.
+- All **six Playwright cases** across desktop Chromium and a mobile Chromium viewport.
+- All **eight release-policy tests**, covering trusted refs, main builds, version tags, prereleases, invalid tags, and output injection.
 
-Requests to both PyPI and npm failed through the configured proxy with **503 Service Unavailable**. Django, Scrapy, Parsel, Quasar, and Vue dependencies therefore could not be installed. The API/database suite, parser suite, typecheck/build, browser tests, container runtime, and native packaging remain unexecuted. The initial migration is supplied, but `makemigrations --check` and an actual database migration still need to run.
+The backend and client install from committed `uv.lock` and `package-lock.json`. Docker builds receive the same locks used by the test jobs.
 
-Before considering the application production-verified, execute the README check commands, commit resolved lockfiles, boot the complete stack, and capture current Kakuyomu/publisher/press fixtures from permitted live collection. Verify source terms for the intended deployment. Optional local/hosted model providers also need a bounded real extraction test with a configured model.
+## Local checks and remaining validation
+
+The implementation environment passed the 29 pure domain cases, Python compilation, generated-contract/schema checks, JSON/TOML parsing, Docker Compose configuration, release-policy tests, and source whitespace checks. Its configured package-registry proxy returned 503 errors, so the full dependency/runtime checks above were executed on GitHub runners.
+
+Live Kakuyomu/publisher/press layouts, NDL resolution, and optional model providers remain unverified. Capture current fixtures through permitted collection and run a bounded extraction test with a configured model. Fixture tests do not establish live source compatibility. Mobile/desktop native packaging also needs the relevant platform toolchains. Check source agreements for the intended deployment.

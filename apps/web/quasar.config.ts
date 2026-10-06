@@ -16,7 +16,7 @@ export default defineConfig(() => ({
   },
   framework: { config: { brand: { primary: '#6854cf', secondary: '#283c42', accent: '#f0a96b', positive: '#398b6c', negative: '#c95561' } }, plugins: ['Notify', 'Dialog'] },
   animations: ['fadeIn', 'fadeOut'],
-  pwa: { workboxMode: 'GenerateSW', manifestFilename: 'manifest.json', injectPwaMetaTags: true, extendGenerateSWOptions(config) { config.navigateFallbackDenylist = [/^\/api\//]; } },
+  pwa: { workboxMode: 'GenerateSW', swFilename: 'service-worker.js', manifestFilename: 'manifest.json', injectPwaMetaTags: true, extendGenerateSWOptions(config) { config.navigateFallbackDenylist = [/^\/api\//]; } },
   capacitor: { hideSplashscreen: true },
   electron: {
     bundler: 'builder',
