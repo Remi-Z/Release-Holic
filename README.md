@@ -167,6 +167,6 @@ Android needs its SDK/JDK, iOS needs macOS/Xcode, and desktop packaging needs th
 
 ## Validation status
 
-GitHub Actions passed **68 backend acceptance tests against PostgreSQL**, Django checks and migrations, generated-contract drift checks, the Quasar typecheck and SPA/PWA builds, **six desktop/mobile browser tests**, and **eight release-policy tests**. Both dependency lockfiles are committed. Details and run links are tracked in [validation notes](docs/validation.md).
+GitHub Actions passed **68 backend acceptance tests against PostgreSQL**, Django checks and migrations, generated-contract drift checks, the Quasar typecheck and SPA/PWA builds, **six desktop/mobile browser tests**, **eight release-policy tests**, and the **complete packaged container stack check**. Both dependency lockfiles are committed. Details and run links are tracked in [validation notes](docs/validation.md).
 
 Kakuyomu selectors/pagination, publisher layouts, press monitors, NDL resolution, model-provider integration, and native packaging still need live validation. Fixture coverage does not establish that current websites still use those layouts.

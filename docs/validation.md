@@ -10,7 +10,7 @@ Implemented acceptance suites:
 
 ## GitHub Actions verification
 
-On 2026-10-06, [the release pipeline](https://github.com/Remi-Z/Release-Holic/actions/runs/37503008702) passed:
+CI verification on 2026-10-06 ([Actions run](https://github.com/Remi-Z/Release-Holic/actions/runs/37505245404)) passed these checks:
 
 - All **68 backend acceptance tests** using Python 3.12 and PostgreSQL 17, including stored HTML parsers and mocked provider integrations.
 - Django system checks, `makemigrations --check --dry-run`, and an actual PostgreSQL migration.
@@ -18,6 +18,7 @@ On 2026-10-06, [the release pipeline](https://github.com/Remi-Z/Release-Holic/ac
 - Client typecheck, SPA build, and PWA build using Node 22.
 - All **six Playwright cases** across desktop Chromium and a mobile Chromium viewport.
 - All **eight release-policy tests**, covering trusted refs, main builds, version tags, prereleases, invalid tags, and output injection.
+- Both Linux AMD64 Docker image builds and the complete packaged stack smoke check: served PWA assets, PostgreSQL migrations, an authenticated API request, RabbitMQ/Celery communication, the scheduler process, and headless Chromium running as the worker's non-root user.
 
 The backend and client install from committed `uv.lock` and `package-lock.json`. Docker builds receive the same locks used by the test jobs.
 
